@@ -1,0 +1,14 @@
+{
+  "Packages": [
+    {
+      "Folder": "DUnitX",
+      "Repository": "https://github.com/VSoftTechnologies/DUnitX",
+      "Branch": "master"
+    },
+    {
+      "Folder": "Spring",
+      "Repository": "https://bitbucket.org/sglienke/spring4d",
+      "Branch": "develop"
+    }
+  ]
+}
