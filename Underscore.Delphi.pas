@@ -23,6 +23,8 @@ type
 
     class function Zip<T>(const Lists: TList<TList<T>>): TList<TList<T>>; overload;
     class function Zip<T>(const Lists: IEnumerable<IEnumerable<T>>): IList<IList<T>>; overload;
+
+    class function Intersection<T: record>(const A, B: IEnumerable<T>): IList<T>; overload;
   end;
 
 implementation
@@ -47,6 +49,20 @@ begin
   Result := TList<S>.Create;
   for Item in List do
     Result.Add(MapFunc(Item));
+end;
+
+class function _.Intersection<T>(const A, B: IEnumerable<T>): IList<T>;
+var
+  Item: T;
+begin
+  Result := TCollections.CreateList<T>;
+  Result.Capacity := A.Count + B.Count;
+
+  for Item in A do
+  begin
+    if B.Contains(Item) then
+      Result.Add(Item);
+  end;
 end;
 
 class function _.Map<T, S>(const List: IEnumerable<T>; const MapFunc: TFunc<T, S>): IList<S>;

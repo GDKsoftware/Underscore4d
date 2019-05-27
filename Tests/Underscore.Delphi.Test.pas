@@ -41,6 +41,12 @@ type
 
     [Test]
     procedure Test123;
+
+    [Test]
+    procedure IntersectionEmpty;
+
+    [Test]
+    procedure Intersection;
   end;
 
 implementation
@@ -53,6 +59,43 @@ uses
   System.SysUtils;
 
 { TUnderscoreDelphiTest }
+
+procedure TUnderscoreDelphiTest.IntersectionEmpty;
+var
+  ListOne: IList<Integer>;
+  ListTwo: IList<Integer>;
+  Intersected: IList<Integer>;
+begin
+  ListOne := TCollections.CreateList<Integer>;
+  ListTwo := TCollections.CreateList<Integer>;
+
+  Intersected := _.Intersection<Integer>(ListOne, ListTwo);
+
+  Assert.AreEqual(0, Intersected.Count);
+end;
+
+procedure TUnderscoreDelphiTest.Intersection;
+var
+  ListOne: IList<Integer>;
+  ListTwo: IList<Integer>;
+  Intersected: IList<Integer>;
+begin
+  ListOne := TCollections.CreateList<Integer>;
+  ListOne.Add(101);
+  ListOne.Add(2);
+  ListOne.Add(1);
+  ListOne.Add(10);
+
+  ListTwo := TCollections.CreateList<Integer>;
+  ListTwo.Add(2);
+  ListTwo.Add(1);
+
+  Intersected := _.Intersection<Integer>(ListOne, ListTwo);
+
+  Assert.AreEqual(2, Intersected.Count);
+  Assert.IsTrue(Intersected.Contains(1));
+  Assert.IsTrue(Intersected.Contains(2));
+end;
 
 procedure TUnderscoreDelphiTest.MapEmptyList;
 var
