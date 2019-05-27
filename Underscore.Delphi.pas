@@ -28,8 +28,6 @@ type
 implementation
 
 uses
-  System.Types,
-  System.TypInfo,
   System.Threading;
 
 class function _.Map<T, S>(const List: TList<T>; const MapFunc: TFunc<T, S>): TList<S>;
