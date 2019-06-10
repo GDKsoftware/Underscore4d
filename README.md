@@ -17,7 +17,7 @@ reduce T     |Aggregate T   |x            |Reduce
 reduce T,S   |x             |x            |Reduce
 reduceRight  |x             |x            |
 find         |First         |x            |
-filter       |Where         |             |Filter
+filter       |Where         |x            |Filter
 where        |
 findWhere    |
 reject       |
