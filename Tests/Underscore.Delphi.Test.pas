@@ -16,7 +16,16 @@ type
     procedure MapEmptySpringList;
 
     [Test]
+    procedure Where;
+
+    [Test]
+    procedure Filter;
+
+    [Test]
     procedure MapIntToStringList;
+
+    [Test]
+    procedure CastMap;
 
     [Test]
     procedure MapIntEnumerable;
@@ -47,6 +56,21 @@ type
 
     [Test]
     procedure Intersection;
+
+    [Test]
+    procedure Difference;
+
+    [Test]
+    procedure Union;
+
+    [Test]
+    procedure EveryFalse;
+
+    [Test]
+    procedure EveryTrue;
+
+    [Test]
+    procedure EveryFalseTList;
   end;
 
 implementation
@@ -72,6 +96,60 @@ begin
   Intersected := _.Intersection<Integer>(ListOne, ListTwo);
 
   Assert.AreEqual(0, Intersected.Count);
+end;
+
+procedure TUnderscoreDelphiTest.EveryFalse;
+var
+  List: IList<Integer>;
+begin
+  List := TCollections.CreateList<Integer>;
+  List.Add(2);
+  List.Add(4);
+  List.Add(5);
+
+  Assert.IsFalse(
+    List.All(
+      function(const Value: Integer): Boolean
+      begin
+        Result := Value mod 2 = 0;
+      end)
+  );
+end;
+
+procedure TUnderscoreDelphiTest.EveryFalseTList;
+var
+  List: TList<Integer>;
+begin
+  List := TList<Integer>.Create;
+  List.Add(2);
+  List.Add(4);
+  List.Add(5);
+
+  Assert.IsFalse(
+    _.Every<Integer>(List,
+      function(const Value: Integer): Boolean
+      begin
+        Result := Value mod 2 = 0;
+      end)
+  );
+end;
+
+procedure TUnderscoreDelphiTest.EveryTrue;
+var
+  List: IList<Integer>;
+begin
+  List := TCollections.CreateList<Integer>;
+  List.Add(2);
+  List.Add(4);
+  List.Add(6);
+
+  Assert.IsTrue(
+    List.All(
+      function(const Value: Integer): Boolean
+      begin
+        Result := Value mod 2 = 0;
+      end)
+  );
 end;
 
 procedure TUnderscoreDelphiTest.Intersection;
@@ -105,12 +183,56 @@ begin
   ListOne := TList<Integer>.Create;
 
   ListTwo := _.Map<Integer, string>(ListOne,
-    function(Item: Integer): string
+    function(const Item: Integer): string
     begin
       Result := Item.ToString;
     end);
 
   Assert.AreEqual(ListTwo.Count, 0);
+end;
+
+procedure TUnderscoreDelphiTest.Where;
+var
+  ListIn: IList<Integer>;
+  ListOut: IEnumerable<Integer>;
+begin
+  ListIn := TCollections.CreateList<Integer>;
+  ListIn.Add(101);
+  ListIn.Add(2);
+  ListIn.Add(1);
+  ListIn.Add(10);
+
+  ListOut := ListIn.Where(
+    function(const Value: Integer): Boolean
+    begin
+      Result := Value mod 2 = 0;
+    end);
+
+  Assert.AreEqual(2, ListOut.Count);
+  Assert.IsTrue(ListOut.Contains(2));
+  Assert.IsTrue(ListOut.Contains(10));
+end;
+
+procedure TUnderscoreDelphiTest.Filter;
+var
+  ListIn: TList<Integer>;
+  ListOut: TList<Integer>;
+begin
+  ListIn := TList<Integer>.Create;
+  ListIn.Add(101);
+  ListIn.Add(2);
+  ListIn.Add(1);
+  ListIn.Add(10);
+
+  ListOut := _.Filter<Integer>(ListIn,
+    function(const Value: Integer): Boolean
+    begin
+      Result := Value mod 2 = 0;
+    end);
+
+  Assert.AreEqual(2, ListOut.Count);
+  Assert.IsTrue(ListOut.Contains(2));
+  Assert.IsTrue(ListOut.Contains(10));
 end;
 
 procedure TUnderscoreDelphiTest.MapEmptySpringList;
@@ -121,7 +243,7 @@ begin
   ListOne := TCollections.CreateList<Integer>;
 
   ListTwo := _.Map<Integer, string>(ListOne,
-    function(Item: Integer): string
+    function(const Item: Integer): string
     begin
       Result := Item.ToString;
     end);
@@ -139,7 +261,7 @@ begin
   ListOne.Add(2);
 
   ListTwo := _.Map<Integer, string>(ListOne,
-    function(Item: Integer): string
+    function(const Item: Integer): string
     begin
       Result := Item.ToString;
     end);
@@ -162,7 +284,7 @@ begin
   end;
 
   ListTwo := _.MapP<Integer, string>(ListOne,
-    function(Item: Integer): string
+    function(const Item: Integer): string
     begin
       Result := Item.ToString;
     end);
@@ -185,7 +307,7 @@ begin
   ListOne.Push(2);
 
   ListTwo := _.Map<Integer, string>(ListOne,
-    function(Item: Integer): string
+    function(const Item: Integer): string
     begin
       Result := Item.ToString;
     end);
@@ -203,7 +325,7 @@ begin
   ListOne := TList<Integer>.Create;
 
   Value := _.Reduce<Integer>(ListOne,
-    function(Current, Item: Integer): Integer
+    function(const Current, Item: Integer): Integer
     begin
       Result := Current + Item;
     end,
@@ -223,7 +345,7 @@ begin
   ListOne.Add(9);
 
   Value := _.Reduce<Integer>(ListOne,
-    function(Current, Item: Integer): Integer
+    function(const Current, Item: Integer): Integer
     begin
       Result := Current + Item;
     end,
@@ -243,7 +365,7 @@ begin
   ListOne.Add(9);
 
   Value := _.Reduce<Integer, string>(ListOne,
-    function(Current: string; Item: Integer): string
+    function(const Current: string; const Item: Integer): string
     begin
       if Current.IsEmpty then
         Result := Item.ToString
@@ -266,10 +388,9 @@ begin
   ListOne.AddOrSetValue(2, 2);
 
   Value := _.Reduce<TPair<Integer, Integer>>(ListOne,
-    function(Current, Item: TPair<Integer, Integer>): TPair<Integer, Integer>
+    function(const Current, Item: TPair<Integer, Integer>): TPair<Integer, Integer>
     begin
-      Current.Value := Current.Value + Item.Value;
-      Result := Current;
+      Result.Value := Current.Value + Item.Value;
     end,
     TPair<Integer, Integer>.Create(0, 0));
 
@@ -316,6 +437,7 @@ var
   InList: IList<Integer>;
   OutValue: string;
   MappedList: IList<String>;
+  Sum: Integer;
 begin
   InList := TCollections.CreateList<Integer>;
   InList.Add(2);
@@ -324,13 +446,21 @@ begin
 
   MappedList := _.Map<Integer, string>(
     InList,
-    function(Value: Integer): string
+    function(const Value: Integer): string
     begin
       Result := Value.ToString;
     end);
 
+  Sum := InList.Aggregate(
+    function(const A, B: Integer): Integer
+    begin
+      Result := A + B;
+    end);
+
+  Assert.AreEqual(9, Sum);
+
   OutValue := _.Reduce<string>(MappedList,
-    function(Current, Value: string): string
+    function(const Current, Value: string): string
     begin
       if Current.IsEmpty then
         Result := Value
@@ -340,6 +470,72 @@ begin
     String.Empty);
 
   Assert.AreEqual('2;6;1', OutValue);
+end;
+
+procedure TUnderscoreDelphiTest.CastMap;
+var
+  InList: IList<Integer>;
+  OutList: IEnumerable<Variant>;
+begin
+  InList := TCollections.CreateList<Integer>;
+  InList.Add(2);
+  InList.Add(6);
+  InList.Add(1);
+
+  OutList := TEnumerable.OfType<Integer, Variant>(InList);
+
+  Assert.AreEqual(3, OutList.Count);
+end;
+
+procedure TUnderscoreDelphiTest.Difference;
+var
+  ListOne: IList<Integer>;
+  ListTwo: IList<Integer>;
+  ResultSet: IList<Integer>;
+begin
+  ListOne := TCollections.CreateList<Integer>;
+  ListOne.Add(101);
+  ListOne.Add(2);
+  ListOne.Add(1);
+  ListOne.Add(10);
+
+  ListTwo := TCollections.CreateList<Integer>;
+  ListTwo.Add(3);
+  ListTwo.Add(2);
+  ListTwo.Add(1);
+
+  ResultSet := _.Difference<Integer>(ListOne, ListTwo);
+
+  Assert.AreEqual(2, ResultSet.Count);
+  Assert.IsTrue(ResultSet.Contains(101));
+  Assert.IsTrue(ResultSet.Contains(10));
+end;
+
+procedure TUnderscoreDelphiTest.Union;
+var
+  ListOne: IList<Integer>;
+  ListTwo: IList<Integer>;
+  ResultSet: IList<Integer>;
+begin
+  ListOne := TCollections.CreateList<Integer>;
+  ListOne.Add(101);
+  ListOne.Add(2);
+  ListOne.Add(1);
+  ListOne.Add(10);
+
+  ListTwo := TCollections.CreateList<Integer>;
+  ListTwo.Add(3);
+  ListTwo.Add(2);
+  ListTwo.Add(1);
+
+  ResultSet := _.Union<Integer>(ListOne, ListTwo);
+
+  Assert.AreEqual(5, ResultSet.Count);
+  Assert.IsTrue(ResultSet.Contains(101));
+  Assert.IsTrue(ResultSet.Contains(2));
+  Assert.IsTrue(ResultSet.Contains(1));
+  Assert.IsTrue(ResultSet.Contains(10));
+  Assert.IsTrue(ResultSet.Contains(3));
 end;
 
 initialization
