@@ -10,9 +10,9 @@ Underscore4d adds functions in the style of UnderscoreJS, using the _ namespace 
 UnderscoreJS |Spring4d      |Delphi       |Underscore4d
 -------------|--------------|-------------|------------
 each         |ForEach       |x            |
-map T        |CastTo?       |x            |Map
-map T,S      |x             |OfType?      |Map
-reduce T     |Aggregate T   |Sum?         |Reduce
+map T        |x             |x            |Map
+map T,S      |OfType?       |x            |Map
+reduce T     |Aggregate T   |x            |Reduce
 reduce T,S   |x             |x            |Reduce
 reduceRight  |x             |x            |
 find         |First         |x            |
@@ -22,7 +22,7 @@ findWhere    |
 reject       |
 every        |All
 some         |Any
-contains     |Contains      |Contains
+contains     |Contains      |Contains     |x
 pluck
 max
 min
