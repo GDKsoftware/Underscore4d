@@ -1,6 +1,7 @@
 # Underscore4d
 
-This project makes an effort to add functional algorithms that are available in most modern languages (JS, C#, C++) but not yet in Delphi. Spring4d adds a lot of these things, but are still not available directly for builtin Delphi types.
+This project makes an effort to add functional algorithms that are available in most modern languages (JS, C#, C++) and native in functional languages, but are generally not available in Delphi yet.
+Spring4d adds a lot of this functionality for IEnumerable<T>, but are still not available for builtin Delphi types like TList<T>.
 
 Underscore4d adds functions in the style of UnderscoreJS, using the _ namespace and passing both list/enumerable and the (anonymous) function to perform.
 
@@ -20,7 +21,7 @@ filter       |Where         |             |Filter
 where        |
 findWhere    |
 reject       |
-every        |All
+every        |All           |x            |Every
 some         |Any
 contains     |Contains      |Contains     |x
 pluck
