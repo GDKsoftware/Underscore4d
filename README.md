@@ -1,5 +1,12 @@
 # Underscore4d
 
+This project makes an effort to add functional algorithms that are available in most modern languages (JS, C#, C++) but not yet in Delphi. Spring4d adds a lot of these things, but are still not available directly for builtin Delphi types.
+
+Underscore4d adds functions in the style of UnderscoreJS, using the _ namespace and passing both list/enumerable and the (anonymous) function to perform.
+
+(Be aware that there's a performance penalty when using this library, as the supplied anonymous functions will not be inlined into the algorithm.)
+
+
 UnderscoreJS |Spring4d      |Delphi       |Underscore4d
 -------------|--------------|-------------|------------
 each         |ForEach       |x            |
