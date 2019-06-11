@@ -35,7 +35,8 @@ type
 
     class function Every<T>(const List: TList<T>; const Predicate: _Predicate<T>): Boolean;
 
-    class function Filter<T>(const List: TList<T>; const Predicate: _Predicate<T>): TList<T>;
+    class function Filter<T>(const List: TList<T>; const Predicate: _Predicate<T>): TList<T>; overload;
+    class function Filter<T>(const List: TArray<T>; const Predicate: _Predicate<T>): IList<T>; overload;
 
     class function Join<T>(const List: IEnumerable<T>; const JoinFunc: _Func<T, string>; const Separator: string): string;
   end;
@@ -91,6 +92,20 @@ begin
       Result := False;
       Exit;
     end;
+  end;
+end;
+
+class function _.Filter<T>(const List: TArray<T>; const Predicate: _Predicate<T>): IList<T>;
+var
+  Item: T;
+begin
+  Result := TCollections.CreateList<T>;
+  Result.Capacity := Length(List);
+
+  for Item in List do
+  begin
+    if Predicate(Item) then
+      Result.Add(Item);
   end;
 end;
 
