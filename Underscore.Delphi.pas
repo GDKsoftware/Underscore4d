@@ -9,18 +9,22 @@ uses
   System.SysUtils;
 
 type
+  _Func<T, TResult> = reference to function(const arg: T): TResult;
+  _Func<A, B, TResult> = reference to function(const arga: A; const argb: B): TResult;
+  _Predicate<T> = reference to function(const arg: T): Boolean;
+
   _ = class
   public
-    class function Map<T, S>(const List: TList<T>; const MapFunc: Func<T, S>): TList<S>; overload;
-    class function Map<T, S>(const List: TEnumerable<T>; const MapFunc: Func<T, S>): TList<S>; overload;
-    class function Map<T, S>(const List: IEnumerable<T>; const MapFunc: Func<T, S>): IList<S>; overload;
+    class function Map<T, S>(const List: TList<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
+    class function Map<T, S>(const List: TEnumerable<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
+    class function Map<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>; overload;
 
-    class function MapP<T, S>(const List: IEnumerable<T>; const MapFunc: Func<T, S>): IList<S>;
+    class function MapP<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>;
 
-    class function Reduce<T>(const List: TEnumerable<T>; const ReduceFunc: Func<T, T, T>; const InitialValue: T): T; overload;
-    class function Reduce<T,S>(const List: TEnumerable<T>; const ReduceFunc: Func<S, T, S>; const InitialValue: S): S; overload;
-    class function Reduce<T>(const List: IEnumerable<T>; const ReduceFunc: Func<T, T, T>; const InitialValue: T): T; overload;
-    class function Reduce<T,S>(const List: IEnumerable<T>; const ReduceFunc: Func<S, T, S>; const InitialValue: S): S; overload;
+    class function Reduce<T>(const List: TEnumerable<T>; const ReduceFunc: _Func<T, T, T>; const InitialValue: T): T; overload;
+    class function Reduce<T,S>(const List: TEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S; overload;
+    class function Reduce<T>(const List: IEnumerable<T>; const ReduceFunc: _Func<T, T, T>; const InitialValue: T): T; overload;
+    class function Reduce<T,S>(const List: IEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S; overload;
 
     class function Zip<T>(const Lists: TList<TList<T>>): TList<TList<T>>; overload;
     class function Zip<T>(const Lists: IEnumerable<IEnumerable<T>>): IList<IList<T>>; overload;
@@ -29,9 +33,11 @@ type
     class function Difference<T: record>(const A, B: IEnumerable<T>): IList<T>;
     class function Union<T: record>(const A, B: IEnumerable<T>): IList<T>;
 
-    class function Every<T>(const List: TList<T>; const Predicate: Predicate<T>): Boolean;
+    class function Every<T>(const List: TList<T>; const Predicate: _Predicate<T>): Boolean;
 
-    class function Filter<T>(const List: TList<T>; const Predicate: Predicate<T>): TList<T>;
+    class function Filter<T>(const List: TList<T>; const Predicate: _Predicate<T>): TList<T>;
+
+    class function Join<T>(const List: IEnumerable<T>; const JoinFunc: _Func<T, string>; const Separator: string): string;
   end;
 
 implementation
@@ -39,7 +45,7 @@ implementation
 uses
   System.Threading;
 
-class function _.Map<T, S>(const List: TList<T>; const MapFunc: Func<T, S>): TList<S>;
+class function _.Map<T, S>(const List: TList<T>; const MapFunc: _Func<T, S>): TList<S>;
 var
   Item: T;
 begin
@@ -49,7 +55,7 @@ begin
     Result.Add(MapFunc(Item));
 end;
 
-class function _.Map<T, S>(const List: TEnumerable<T>; const MapFunc: Func<T, S>): TList<S>;
+class function _.Map<T, S>(const List: TEnumerable<T>; const MapFunc: _Func<T, S>): TList<S>;
 var
   Item: T;
 begin
@@ -72,7 +78,7 @@ begin
   end;
 end;
 
-class function _.Every<T>(const List: TList<T>; const Predicate: Predicate<T>): Boolean;
+class function _.Every<T>(const List: TList<T>; const Predicate: _Predicate<T>): Boolean;
 var
   Item: T;
 begin
@@ -88,7 +94,7 @@ begin
   end;
 end;
 
-class function _.Filter<T>(const List: TList<T>; const Predicate: Predicate<T>): TList<T>;
+class function _.Filter<T>(const List: TList<T>; const Predicate: _Predicate<T>): TList<T>;
 var
   Item: T;
 begin
@@ -116,6 +122,23 @@ begin
   end;
 end;
 
+class function _.Join<T>(const List: IEnumerable<T>; const JoinFunc: _Func<T, string>; const Separator: string): string;
+var
+  Value: string;
+  Item: T;
+begin
+  Result := String.Empty;
+
+  for Item in List do
+  begin
+    Value := JoinFunc(Item);
+    if Result.IsEmpty then
+      Result := Value
+    else
+      Result := Result + Separator + Value;
+  end;
+end;
+
 class function _.Union<T>(const A, B: IEnumerable<T>): IList<T>;
 var
   Item: T;
@@ -136,7 +159,7 @@ begin
   end;
 end;
 
-class function _.Map<T, S>(const List: IEnumerable<T>; const MapFunc: Func<T, S>): IList<S>;
+class function _.Map<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>;
 var
   Item: T;
 begin
@@ -147,7 +170,7 @@ begin
     Result.Add(MapFunc(Item));
 end;
 
-class function _.MapP<T, S>(const List: IEnumerable<T>; const MapFunc: Func<T, S>): IList<S>;
+class function _.MapP<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>;
 var
   Item: T;
   Idx: Integer;
@@ -168,7 +191,7 @@ begin
     end);
 end;
 
-class function _.Reduce<T, S>(const List: TEnumerable<T>; const ReduceFunc: Func<S, T, S>; const InitialValue: S): S;
+class function _.Reduce<T, S>(const List: TEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S;
 var
   Item: T;
 begin
@@ -177,7 +200,7 @@ begin
     Result := ReduceFunc(Result, Item);
 end;
 
-class function _.Reduce<T>(const List: TEnumerable<T>; const ReduceFunc: Func<T, T, T>; const InitialValue: T): T;
+class function _.Reduce<T>(const List: TEnumerable<T>; const ReduceFunc: _Func<T, T, T>; const InitialValue: T): T;
 var
   Item: T;
 begin
@@ -186,7 +209,7 @@ begin
     Result := ReduceFunc(Result, Item);
 end;
 
-class function _.Reduce<T>(const List: IEnumerable<T>; const ReduceFunc: Func<T, T, T>; const InitialValue: T): T;
+class function _.Reduce<T>(const List: IEnumerable<T>; const ReduceFunc: _Func<T, T, T>; const InitialValue: T): T;
 var
   Item: T;
 begin
@@ -196,7 +219,7 @@ begin
     Result := ReduceFunc(Result, Item);
 end;
 
-class function _.Reduce<T, S>(const List: IEnumerable<T>; const ReduceFunc: Func<S, T, S>; const InitialValue: S): S;
+class function _.Reduce<T, S>(const List: IEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S;
 var
   Item: T;
 begin
