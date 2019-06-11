@@ -52,6 +52,15 @@ type
     procedure Test123;
 
     [Test]
+    procedure Find;
+
+    [Test]
+    procedure FindNothing;
+
+    [Test]
+    procedure Join;
+
+    [Test]
     procedure IntersectionEmpty;
 
     [Test]
@@ -451,13 +460,13 @@ begin
       Result := Value.ToString;
     end);
 
-  Sum := InList.Aggregate(
-    function(const A, B: Integer): Integer
-    begin
-      Result := A + B;
-    end);
-
-  Assert.AreEqual(9, Sum);
+//  Sum := InList.Aggregate(
+//    function(A, B: Integer): Integer
+//    begin
+//      Result := A + B;
+//    end);
+//
+//  Assert.AreEqual(9, Sum);
 
   OutValue := _.Reduce<string>(MappedList,
     function(const Current, Value: string): string
@@ -536,6 +545,66 @@ begin
   Assert.IsTrue(ResultSet.Contains(1));
   Assert.IsTrue(ResultSet.Contains(10));
   Assert.IsTrue(ResultSet.Contains(3));
+end;
+
+procedure TUnderscoreDelphiTest.Find;
+var
+  List: TList<Integer>;
+  OutValue: Integer;
+begin
+  List := TList<Integer>.Create;
+  List.Add(1);
+  List.Add(4);
+  List.Add(5);
+
+  OutValue := _.Find<Integer>(List,
+      function(const Value: Integer): Boolean
+      begin
+        Result := Value mod 2 = 0;
+      end);
+
+  Assert.AreEqual(4, OutValue);
+end;
+
+procedure TUnderscoreDelphiTest.FindNothing;
+var
+  List: TList<Integer>;
+  OutValue: Integer;
+begin
+  List := TList<Integer>.Create;
+  List.Add(1);
+  List.Add(3);
+  List.Add(5);
+
+  Assert.WillRaise(
+    procedure
+    begin
+      _.Find<Integer>(List,
+          function(const Value: Integer): Boolean
+          begin
+            Result := Value mod 2 = 0;
+          end)
+    end);
+end;
+
+procedure TUnderscoreDelphiTest.Join;
+var
+  InList: IList<Integer>;
+  OutValue: string;
+begin
+  InList := TCollections.CreateList<Integer>;
+  InList.Add(2);
+  InList.Add(6);
+  InList.Add(1);
+
+  OutValue := _.Join<Integer>(InList,
+    function(const Value: Integer): string
+    begin
+      Result := Value.ToString;
+    end,
+    ';');
+
+  Assert.AreEqual('2;6;1', OutValue);
 end;
 
 initialization

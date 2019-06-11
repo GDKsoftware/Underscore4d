@@ -39,6 +39,8 @@ type
     class function Filter<T>(const List: TArray<T>; const Predicate: _Predicate<T>): IList<T>; overload;
 
     class function Join<T>(const List: IEnumerable<T>; const JoinFunc: _Func<T, string>; const Separator: string): string;
+
+    class function Find<T>(const List: TList<T>; const Predicate: _Predicate<T>): T;
   end;
 
 implementation
@@ -107,6 +109,22 @@ begin
     if Predicate(Item) then
       Result.Add(Item);
   end;
+end;
+
+class function _.Find<T>(const List: TList<T>; const Predicate: _Predicate<T>): T;
+var
+  Item: T;
+begin
+  for Item in List do
+  begin
+    if Predicate(Item) then
+    begin
+      Result := Item;
+      Exit;
+    end;
+  end;
+
+  raise EInvalidOperationException.Create('No item found');
 end;
 
 class function _.Filter<T>(const List: TList<T>; const Predicate: _Predicate<T>): TList<T>;
