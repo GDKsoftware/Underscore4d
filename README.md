@@ -16,7 +16,7 @@ map T,S      |OfType?       |x            |Map
 reduce T     |Aggregate T   |x            |Reduce
 reduce T,S   |x             |x            |Reduce
 reduceRight  |x             |x            |
-find         |First         |x            |
+find         |First         |x            |Find*
 filter       |Where         |x            |Filter
 where        |
 findWhere    |
@@ -57,3 +57,9 @@ sortedIndex
 findIndex
 findLastIndex
 range
+
+*) will throw exception on failure
+
+## Extra functions
+* Join
+
