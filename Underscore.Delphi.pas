@@ -41,6 +41,7 @@ type
     class function Join<T>(const List: IEnumerable<T>; const JoinFunc: _Func<T, string>; const Separator: string): string;
 
     class function Find<T>(const List: TList<T>; const Predicate: _Predicate<T>): T;
+    class function FindOrDefault<T>(const List: TList<T>; const Predicate: _Predicate<T>; const Default: T): T;
   end;
 
 implementation
@@ -125,6 +126,22 @@ begin
   end;
 
   raise EInvalidOperationException.Create('No item found');
+end;
+
+class function _.FindOrDefault<T>(const List: TList<T>; const Predicate: _Predicate<T>; const Default: T): T;
+var
+  Item: T;
+begin
+  Result := Default;
+
+  for Item in List do
+  begin
+    if Predicate(Item) then
+    begin
+      Result := Item;
+      Exit;
+    end;
+  end;
 end;
 
 class function _.Filter<T>(const List: TList<T>; const Predicate: _Predicate<T>): TList<T>;

@@ -58,6 +58,9 @@ type
     procedure FindNothing;
 
     [Test]
+    procedure FindOrDefault;
+
+    [Test]
     procedure Join;
 
     [Test]
@@ -585,6 +588,30 @@ begin
             Result := Value mod 2 = 0;
           end)
     end);
+end;
+
+procedure TUnderscoreDelphiTest.FindOrDefault;
+var
+  List: TList<Integer>;
+begin
+  List := TList<Integer>.Create;
+  List.Add(1);
+  List.Add(3);
+  List.Add(5);
+
+  Assert.AreEqual(3,
+    _.FindOrDefault<Integer>(List,
+      function(const Value: Integer): Boolean
+      begin
+        Result := Value = 3;
+      end, -1));
+
+  Assert.AreEqual(-1,
+    _.FindOrDefault<Integer>(List,
+      function(const Value: Integer): Boolean
+      begin
+        Result := Value mod 2 = 0;
+      end, -1));
 end;
 
 procedure TUnderscoreDelphiTest.Join;
