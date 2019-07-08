@@ -17,7 +17,7 @@ reduce T     |Aggregate T   |x            |Reduce
 reduce T,S   |x             |x            |Reduce
 reduceRight  |x             |x            |
 find         |First         |x            |Find*
-find noexcept|FirstOrDefault|x            |
+find noexcept|FirstOrDefault|x            |FindOrDefault
 filter       |Where         |x            |Filter
 where        |
 findWhere    |
