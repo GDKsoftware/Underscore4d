@@ -96,4 +96,54 @@ Totals := _.Reduce<TThing, TVATTotals>(List,
   end, EmptyTotals);
 ```
 
-## Other kinds of for each element in a list, do something
+## Check if all items match a certain condition
+
+For code that looks like this:
+
+```
+Result := True;
+for Item in List do
+begin
+  if Item.Value mod 2 <> 0 then
+  begin
+    Result := False;
+    Exit;
+  end;
+end;
+```
+
+Instead, use **All**:
+
+```
+Result := _.All<TThing>(List,
+  function(const Item: TThing): Boolean
+  begin
+    Result := Item.Value mod 2 <> 0;
+  end);
+```
+
+## Check if at least 1 item matches a certain condition
+
+For code that looks like this:
+
+```
+Result := False;
+for Item in List do
+begin
+  if Item.Value mod 2 = 0 then
+  begin
+    Result := True;
+    Exit;
+  end;
+end;
+```
+
+Instead, use **Any**:
+
+```
+Result := _.Any<TThing>(List,
+  function(const Item: TThing): Boolean
+  begin
+    Result := Item.Value mod 2 = 0;
+  end);
+```
