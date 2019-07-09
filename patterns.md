@@ -24,6 +24,55 @@ NewList := _.Map<TThing, TNewThing>(List,
   end);
 ```
 
+## Filtering a list
+
+For code that looks like this:
+
+```
+for Item in List do
+begin
+  if Item.ShouldFilter then
+  begin
+    NewList.Add(Item);
+  end;
+end;
+```
+
+Instead, use **Filter**:
+
+```
+NewList := _.Filter<TThing>(List,
+  function(const Item: TThing): Boolean
+  begin
+    Result := Item.ShouldFilter;
+  end);
+```
+
+## Find an item in a list
+
+For code that looks like this:
+
+```
+for Item in List do
+begin
+  if (Item.Value = 5) and Item.OtherValue then
+  begin
+    Result := Item;
+    Exit;
+  end;
+end;
+```
+
+Instead, use **Find** *(First in Spring4d)*:
+
+```
+Result := _.FindOrDefault<TThing>(List,
+  function(const Item: TThing): Boolean
+  begin
+    Result := (Item.Value = 5) and Item.OtherValue;
+  end, nil);
+```
+
 ## Creating a summary of items in a list
 
 For code that looks like this:
@@ -46,34 +95,5 @@ Totals := _.Reduce<TThing, TVATTotals>(List,
     Result.TotalInclVAT := Current.TotalInclVAT + Item.Value * 1.21;
   end, EmptyTotals);
 ```
-
-## Find an item in a list
-
-For code that looks like this:
-
-```
-Result := nil;
-
-for Item in List do
-begin
-  if (Item.Value = 5) and Item.OtherValue then
-  begin
-    Result := Item;
-    Exit;
-  end;
-end;
-```
-
-Instead, use **Find** *(First in Spring4d)*:
-
-```
-Result := _.FindOrDefault(List,
-  function(const Item: TThing): Boolean
-  begin
-    Result := (Item.Value = 5) and Item.OtherValue;
-  end, nil);
-```
-
-
 
 ## Other kinds of for each element in a list, do something
