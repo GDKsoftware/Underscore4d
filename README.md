@@ -26,8 +26,8 @@ every        |All           |x            |Every
 some         |Any
 contains     |Contains      |Contains     |x
 pluck
-max
-min
+max T        |              |             |Max*
+min T        |              |             |Min*
 sortBy
 groupBy
 indexBy
