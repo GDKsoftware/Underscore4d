@@ -147,3 +147,28 @@ Result := _.Any<TThing>(List,
     Result := Item.Value mod 2 = 0;
   end);
 ```
+
+## Find the Object with a mininum or maximum value
+
+For code that looks like this:
+
+```
+for Item in List do
+begin
+  if Item.SomeValue < MininumValue then
+  begin
+    MininumValue := Item.SomeValue;
+    MininumItem := Item;
+  end;
+end;
+```
+
+Instead, use **Min** (or **Max**):
+
+```
+MininumItem := _.Min<TThing>(List,
+  function(const Item: TThing): Integer
+  begin
+    Result := Item.SomeValue;
+  end);
+```
