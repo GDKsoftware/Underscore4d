@@ -83,6 +83,17 @@ type
 
     [Test]
     procedure EveryFalseTList;
+
+    [Test]
+    procedure Min;
+
+    [Test]
+    procedure Max;
+  end;
+
+  TMyRec = record
+    Id: Integer;
+    SomeValue: Integer;
   end;
 
 implementation
@@ -449,7 +460,6 @@ var
   InList: IList<Integer>;
   OutValue: string;
   MappedList: IList<String>;
-  Sum: Integer;
 begin
   InList := TCollections.CreateList<Integer>;
   InList.Add(2);
@@ -572,7 +582,6 @@ end;
 procedure TUnderscoreDelphiTest.FindNothing;
 var
   List: TList<Integer>;
-  OutValue: Integer;
 begin
   List := TList<Integer>.Create;
   List.Add(1);
@@ -632,6 +641,62 @@ begin
     ';');
 
   Assert.AreEqual('2;6;1', OutValue);
+end;
+
+procedure TUnderscoreDelphiTest.Max;
+var
+  List: TList<TMyRec>;
+  OutValue: TMyRec;
+  A, B, C: TMyRec;
+begin
+  A.Id := 1;
+  A.SomeValue := 2;
+  B.Id := 2;
+  B.SomeValue := 6;
+  C.Id := 3;
+  C.SomeValue := 1;
+
+  List := TList<TMyRec>.Create;
+  List.Add(A);
+  List.Add(B);
+  List.Add(C);
+
+  OutValue := _.Max<TMyRec>(List,
+    function(const Item: TMyRec): Integer
+    begin
+      Result := Item.SomeValue;
+    end);
+
+  Assert.AreEqual(B.Id, OutValue.Id);
+  Assert.AreEqual(B.SomeValue, OutValue.SomeValue);
+end;
+
+procedure TUnderscoreDelphiTest.Min;
+var
+  List: TList<TMyRec>;
+  OutValue: TMyRec;
+  A, B, C: TMyRec;
+begin
+  A.Id := 1;
+  A.SomeValue := 2;
+  B.Id := 2;
+  B.SomeValue := 6;
+  C.Id := 3;
+  C.SomeValue := 1;
+
+  List := TList<TMyRec>.Create;
+  List.Add(A);
+  List.Add(B);
+  List.Add(C);
+
+  OutValue := _.Min<TMyRec>(List,
+    function(const Item: TMyRec): Integer
+    begin
+      Result := Item.SomeValue;
+    end);
+
+  Assert.AreEqual(C.Id, OutValue.Id);
+  Assert.AreEqual(C.SomeValue, OutValue.SomeValue);
 end;
 
 initialization

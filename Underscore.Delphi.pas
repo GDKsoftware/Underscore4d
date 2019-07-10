@@ -42,6 +42,9 @@ type
 
     class function Find<T>(const List: TList<T>; const Predicate: _Predicate<T>): T;
     class function FindOrDefault<T>(const List: TList<T>; const Predicate: _Predicate<T>; const Default: T): T;
+
+    class function Min<T>(const List: TList<T>; const ValueFunc: _Func<T, Integer>): T;
+    class function Max<T>(const List: TList<T>; const ValueFunc: _Func<T, Integer>): T;
   end;
 
 implementation
@@ -325,6 +328,50 @@ begin
       Result[Idx].Add(Item);
 
       Inc(Idx);
+    end;
+  end;
+end;
+
+class function _.Min<T>(const List: TList<T>; const ValueFunc: _Func<T, Integer>): T;
+var
+  Item: T;
+  ItemValue: Integer;
+  MinValue: Integer;
+begin
+  MinValue := MaxInt;
+
+  if List.Count = 0 then
+    raise ENotSupportedException.Create('No items found');
+
+  for Item in List do
+  begin
+    ItemValue := ValueFunc(Item);
+    if ItemValue < MinValue then
+    begin
+      MinValue := ItemValue;
+      Result := Item;
+    end;
+  end;
+end;
+
+class function _.Max<T>(const List: TList<T>; const ValueFunc: _Func<T, Integer>): T;
+var
+  Item: T;
+  ItemValue: Integer;
+  MaxValue: Integer;
+begin
+  MaxValue := -MaxInt;
+
+  if List.Count = 0 then
+    raise ENotSupportedException.Create('No items found');
+
+  for Item in List do
+  begin
+    ItemValue := ValueFunc(Item);
+    if ItemValue > MaxValue then
+    begin
+      MaxValue := ItemValue;
+      Result := Item;
     end;
   end;
 end;
