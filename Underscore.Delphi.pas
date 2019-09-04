@@ -38,7 +38,8 @@ type
     class function Filter<T>(const List: TList<T>; const Predicate: _Predicate<T>): TList<T>; overload;
     class function Filter<T>(const List: TArray<T>; const Predicate: _Predicate<T>): IList<T>; overload;
 
-    class function Join<T>(const List: IEnumerable<T>; const JoinFunc: _Func<T, string>; const Separator: string): string;
+    class function Join<T>(const List: IEnumerable<T>; const JoinFunc: _Func<T, string>; const Separator: string): string; overload;
+    class function Join<T>(const List: TList<T>; const JoinFunc: _Func<T, string>; const Separator: string): string; overload;
 
     class function Find<T>(const List: TList<T>; const Predicate: _Predicate<T>): T;
     class function FindOrDefault<T>(const List: TList<T>; const Predicate: _Predicate<T>; const Default: T): T;
@@ -172,6 +173,23 @@ begin
   begin
     if B.Contains(Item) then
       Result.Add(Item);
+  end;
+end;
+
+class function _.Join<T>(const List: TList<T>; const JoinFunc: _Func<T, string>; const Separator: string): string;
+var
+  Value: string;
+  Item: T;
+begin
+  Result := String.Empty;
+
+  for Item in List do
+  begin
+    Value := JoinFunc(Item);
+    if Result.IsEmpty then
+      Result := Value
+    else
+      Result := Result + Separator + Value;
   end;
 end;
 
