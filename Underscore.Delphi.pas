@@ -40,6 +40,7 @@ type
 
     class function Join<T>(const List: IEnumerable<T>; const JoinFunc: _Func<T, string>; const Separator: string): string; overload;
     class function Join<T>(const List: TList<T>; const JoinFunc: _Func<T, string>; const Separator: string): string; overload;
+    class function Join(const List: IEnumerable<string>; const Separator: string): string; overload;
 
     class function Find<T>(const List: TList<T>; const Predicate: _Predicate<T>): T;
     class function FindOrDefault<T>(const List: TList<T>; const Predicate: _Predicate<T>; const Default: T): T;
@@ -173,6 +174,21 @@ begin
   begin
     if B.Contains(Item) then
       Result.Add(Item);
+  end;
+end;
+
+class function _.Join(const List: IEnumerable<string>; const Separator: string): string;
+var
+  Value: string;
+begin
+  Result := String.Empty;
+
+  for Value in List do
+  begin
+    if Result.IsEmpty then
+      Result := Value
+    else
+      Result := Result + Separator + Value;
   end;
 end;
 
