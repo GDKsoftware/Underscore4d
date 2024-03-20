@@ -47,7 +47,7 @@ without
 union       |Union          |x       |Union
 intersection|IntersectWith  |x       |Intersection
 difference  |               |x       |Difference
-uniq
+uniq        |               |        |Uniq
 zip         |               |x       |Zip
 unzip
 object
