@@ -18,6 +18,8 @@ type
     class function Map<T, S>(const List: TList<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
     class function Map<T, S>(const List: TEnumerable<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
     class function Map<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>; overload;
+    class function Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<TPair<T,V>, S>): TList<S>; overload;
+    class function Map<T, V, S>(const List: IDictionary<T, V>; const MapFunc: _Func<TPair<T,V>, S>): IList<S>; overload;
 
     class function MapP<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>;
 
@@ -47,6 +49,9 @@ type
 
     class function Min<T>(const List: TList<T>; const ValueFunc: _Func<T, Integer>): T;
     class function Max<T>(const List: TList<T>; const ValueFunc: _Func<T, Integer>): T;
+
+    class function Uniq<T>(const List: IEnumerable<T>): IList<T>; overload;
+    class function Uniq<T>(const List: TList<T>): TList<T>; overload;
   end;
 
 implementation
@@ -246,9 +251,53 @@ begin
   end;
 end;
 
+class function _.Uniq<T>(const List: TList<T>): TList<T>;
+begin
+  Result := TList<T>.Create;
+  Result.Capacity := List.Count;
+  for var Item in List do
+  begin
+    if not Result.Contains(Item) then
+      Result.Add(Item);
+  end;
+end;
+
+class function _.Uniq<T>(const List: IEnumerable<T>): IList<T>;
+begin
+  Result := TCollections.CreateList<T>;
+  Result.Capacity := List.Count;
+  for var Item in List do
+  begin
+    if not Result.Contains(Item) then
+      Result.Add(Item);
+  end;
+end;
+
 class function _.Map<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>;
 var
   Item: T;
+begin
+  Result := TCollections.CreateList<S>;
+  Result.Capacity := List.Count;
+
+  for Item in List do
+    Result.Add(MapFunc(Item));
+end;
+
+class function _.Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<TPair<T, V>, S>): TList<S>;
+var
+  Item: TPair<T, V>;
+begin
+  Result := TList<S>.Create;
+  Result.Capacity := List.Count;
+
+  for Item in List do
+    Result.Add(MapFunc(Item));
+end;
+
+class function _.Map<T, V, S>(const List: IDictionary<T, V>; const MapFunc: _Func<TPair<T, V>, S>): IList<S>;
+var
+  Item: TPair<T, V>;
 begin
   Result := TCollections.CreateList<S>;
   Result.Capacity := List.Count;

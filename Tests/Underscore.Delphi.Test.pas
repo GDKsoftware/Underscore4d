@@ -89,11 +89,19 @@ type
 
     [Test]
     procedure Max;
+
+    [Test]
+    procedure Uniq;
+
+    [Test]
+    procedure MapDictionary;
   end;
 
   TMyRec = record
     Id: Integer;
     SomeValue: Integer;
+
+    class function New(const A, B: Integer): TMyRec; static;
   end;
 
 implementation
@@ -196,6 +204,27 @@ begin
   Assert.AreEqual(2, Intersected.Count);
   Assert.IsTrue(Intersected.Contains(1));
   Assert.IsTrue(Intersected.Contains(2));
+end;
+
+procedure TUnderscoreDelphiTest.MapDictionary;
+var
+  Dict: TDictionary<string, TMyRec>;
+  Mapped: TList<string>;
+begin
+  Dict := TDictionary<string, TMyRec>.Create;
+  Dict.AddOrSetValue('hello', TMyRec.New(1, 2));
+  Dict.AddOrSetValue('world', TMyRec.New(2, 3));
+  Dict.AddOrSetValue('etc 123', TMyRec.New(4, 5));
+
+  Mapped := _.Map<string, TMyRec, string>(Dict,
+    function(const Item: TPair<string, TMyRec>): string
+    begin
+      Result := Format('%s = (%2d,%2d)', [Item.Key, Item.Value.Id, Item.Value.SomeValue]);
+    end);
+
+  Assert.AreEqual('hello = ( 1, 2)', Mapped[0]);
+  Assert.AreEqual('world = ( 2, 3)', Mapped[1]);
+  Assert.AreEqual('etc 123 = ( 4, 5)', Mapped[2]);
 end;
 
 procedure TUnderscoreDelphiTest.MapEmptyList;
@@ -560,6 +589,25 @@ begin
   Assert.IsTrue(ResultSet.Contains(3));
 end;
 
+procedure TUnderscoreDelphiTest.Uniq;
+var
+  List: TList<Integer>;
+  OutList: TList<Integer>;
+begin
+  List := TList<Integer>.Create;
+  List.Add(1);
+  List.Add(4);
+  List.Add(4);
+  List.Add(5);
+
+  OutList := _.Uniq<Integer>(List);
+
+  Assert.AreEqual(3, OutList.Count);
+  Assert.AreEqual(1, OutList[0]);
+  Assert.AreEqual(4, OutList[1]);
+  Assert.AreEqual(5, OutList[2]);
+end;
+
 procedure TUnderscoreDelphiTest.Find;
 var
   List: TList<Integer>;
@@ -697,6 +745,14 @@ begin
 
   Assert.AreEqual(C.Id, OutValue.Id);
   Assert.AreEqual(C.SomeValue, OutValue.SomeValue);
+end;
+
+{ TMyRec }
+
+class function TMyRec.New(const A, B: Integer): TMyRec;
+begin
+  Result.Id := A;
+  Result.SomeValue := B;
 end;
 
 initialization
