@@ -3,6 +3,7 @@ unit Underscore.Delphi.Springless;
 interface
 
 uses
+  System.Classes,
   System.Generics.Collections,
   System.SysUtils;
 
@@ -16,6 +17,7 @@ type
     class function Map<T, S>(const List: TList<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
     class function Map<T, S>(const List: TEnumerable<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
     class function Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<TPair<T,V>, S>): TList<S>; overload;
+    class function Map<T: TCollectionItem; S>(const List: TCollection; const MapFunc: _Func<T, S>): TList<S>; overload;
 
     class function Reduce<T>(const List: TEnumerable<T>; const ReduceFunc: _Func<T, T, T>; const InitialValue: T): T; overload;
     class function Reduce<T,S>(const List: TEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S; overload;
@@ -28,7 +30,8 @@ type
 
     class function Filter<T>(const List: TList<T>; const Predicate: _Predicate<T>): TList<T>; overload;
 
-    class function Join<T>(const List: TList<T>; const JoinFunc: _Func<T, string>; const Separator: string): string;
+    class function Join<T>(const List: TList<T>; const JoinFunc: _Func<T, string>; const Separator: string): string; overload;
+    class function Join(const List: TList<string>; const Separator: string): string; overload;
 
     class function Find<T>(const List: TList<T>; const Predicate: _Predicate<T>): T;
     class function FindOrDefault<T>(const List: TList<T>; const Predicate: _Predicate<T>; const Default: T): T;
@@ -61,6 +64,16 @@ begin
   Result := TList<S>.Create;
   for Item in List do
     Result.Add(MapFunc(Item));
+end;
+
+class function _.Map<T, S>(const List: TCollection; const MapFunc: _Func<T, S>): TList<S>;
+var
+  Item: TCollectionItem;
+  Idx: Integer;
+begin
+  Result := TList<S>.Create;
+  for Idx := 0 to List.Count - 1 do
+    Result.Add(MapFunc(List.Items[Idx] as T));
 end;
 
 class function _.Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<TPair<T, V>, S>): TList<S>;
@@ -119,6 +132,21 @@ begin
       Result := Item;
       Exit;
     end;
+  end;
+end;
+
+class function _.Join(const List: TList<string>; const Separator: string): string;
+var
+  Value: string;
+begin
+  Result := String.Empty;
+
+  for Value in List do
+  begin
+    if Result.IsEmpty then
+      Result := Value
+    else
+      Result := Result + Separator + Value;
   end;
 end;
 
