@@ -3,28 +3,49 @@ unit Underscore.Delphi.Springless;
 interface
 
 uses
+{$ifdef FPC}
+  Classes,
+  SysUtils,
+  Generics.Collections;
+{$else}
   System.Classes,
   System.Generics.Collections,
   System.SysUtils;
+{$endif}
 
 type
+{$ifdef FPC}
+  _Func<T, TResult> = function(const arg: T): TResult;
+  _Func<A, B, TResult> = function(const arga: A; const argb: B): TResult;
+  _Predicate<T> = function(const arg: T): Boolean;
+{$else}
   _Func<T, TResult> = reference to function(const arg: T): TResult;
   _Func<A, B, TResult> = reference to function(const arga: A; const argb: B): TResult;
   _Predicate<T> = reference to function(const arg: T): Boolean;
+{$endif}
 
   _ = class
   public
     class function Map<T, S>(const List: TList<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
     class function Map<T, S>(const List: TEnumerable<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
     class function Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<TPair<T,V>, S>): TList<S>; overload;
+{$ifndef FPC}
     class function Map<T: TCollectionItem; S>(const List: TCollection; const MapFunc: _Func<T, S>): TList<S>; overload;
+{$endif}
 
     class function Reduce<T>(const List: TEnumerable<T>; const ReduceFunc: _Func<T, T, T>; const InitialValue: T): T; overload;
     class function Reduce<T,S>(const List: TEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S; overload;
     class function Reduce<T>(const List: IEnumerable<T>; const ReduceFunc: _Func<T, T, T>; const InitialValue: T): T; overload;
     class function Reduce<T,S>(const List: IEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S; overload;
+    class function Reduce<V,U,T>(const Dic: TDictionary<V, U>; const ReduceFunc: _Func<T, TPair<V, U>, T>; const InitialValue: T): T; overload;
 
+{$ifndef FPC}
     class function Zip<T>(const Lists: TList<TList<T>>): TList<TList<T>>; overload;
+{$endif}
+
+    class function Intersection<T: record>(const A, B: TList<T>): TList<T>;
+    class function Difference<T: record>(const A, B: TList<T>): TList<T>;
+    class function Union<T: record>(const A, B: TList<T>): TList<T>;
 
     class function Every<T>(const List: TList<T>; const Predicate: _Predicate<T>): Boolean;
 
@@ -44,8 +65,10 @@ type
 
 implementation
 
+{$ifndef FPC}
 uses
   System.Threading;
+{$endif}
 
 class function _.Map<T, S>(const List: TList<T>; const MapFunc: _Func<T, S>): TList<S>;
 var
@@ -66,6 +89,7 @@ begin
     Result.Add(MapFunc(Item));
 end;
 
+{$ifndef FPC}
 class function _.Map<T, S>(const List: TCollection; const MapFunc: _Func<T, S>): TList<S>;
 var
   Item: TCollectionItem;
@@ -75,6 +99,7 @@ begin
   for Idx := 0 to List.Count - 1 do
     Result.Add(MapFunc(List.Items[Idx] as T));
 end;
+{$endif}
 
 class function _.Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<TPair<T, V>, S>): TList<S>;
 var
@@ -181,6 +206,34 @@ begin
   end;
 end;
 
+class function _.Intersection<T>(const A, B: TList<T>): TList<T>;
+var
+  Item: T;
+begin
+  Result := TList<T>.Create;
+  Result.Capacity := A.Count + B.Count;
+
+  for Item in A do
+  begin
+    if B.Contains(Item) then
+      Result.Add(Item);
+  end;
+end;
+
+class function _.Difference<T>(const A, B: TList<T>): TList<T>;
+var
+  Item: T;
+begin
+  Result := TList<T>.Create;
+  Result.Capacity := A.Count + B.Count;
+
+  for Item in A do
+  begin
+    if not B.Contains(Item) then
+      Result.Add(Item);
+  end;
+end;
+
 class function _.Reduce<T, S>(const List: TEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S;
 var
   Item: T;
@@ -209,17 +262,6 @@ begin
     Result := ReduceFunc(Result, Item);
 end;
 
-class function _.Uniq<T>(const List: TList<T>): TList<T>;
-begin
-  Result := TList<T>.Create;
-  Result.Capacity := List.Count;
-  for var Item in List do
-  begin
-    if not Result.Contains(Item) then
-      Result.Add(Item);
-  end;
-end;
-
 class function _.Reduce<T, S>(const List: IEnumerable<T>; const ReduceFunc: _Func<S, T, S>; const InitialValue: S): S;
 var
   Item: T;
@@ -230,6 +272,50 @@ begin
     Result := ReduceFunc(Result, Item);
 end;
 
+class function _.Reduce<V,U,T>(const Dic: TDictionary<V, U>; const ReduceFunc: _Func<T, TPair<V, U>, T>; const InitialValue: T): T;
+var
+  Item: TPair<V, U>;
+begin
+  Result := InitialValue;
+
+  for Item in Dic do
+    Result := ReduceFunc(Result, Item);
+end;
+
+class function _.Union<T>(const A, B: TList<T>): TList<T>;
+var
+  Item: T;
+begin
+  Result := TList<T>.Create;
+  Result.Capacity := A.Count + B.Count;
+
+  for Item in A do
+  begin
+    if not Result.Contains(Item) then
+      Result.Add(Item);
+  end;
+
+  for Item in B do
+  begin
+    if not Result.Contains(Item) then
+      Result.Add(Item);
+  end;
+end;
+
+class function _.Uniq<T>(const List: TList<T>): TList<T>;
+var
+  Item: T;
+begin
+  Result := TList<T>.Create;
+  Result.Capacity := List.Count;
+  for Item in List do
+  begin
+    if not Result.Contains(Item) then
+      Result.Add(Item);
+  end;
+end;
+
+{$ifndef FPC}
 class function _.Zip<T>(const Lists: TList<TList<T>>): TList<TList<T>>;
 var
   List: TList<T>;
@@ -253,6 +339,7 @@ begin
     end;
   end;
 end;
+{$endif}
 
 class function _.Min<T>(const List: TList<T>; const ValueFunc: _Func<T, Integer>): T;
 var
