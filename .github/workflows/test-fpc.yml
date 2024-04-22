@@ -21,4 +21,4 @@ jobs:
           cd Tests
           fpc -B -MDelphi "Underscore.Delphi.Springless.Tests.dpr"
       - name: Test
-        run: Tests/Underscore.Delphi.Springless.Tests -a
+        run: Tests/Underscore.Delphi.Springless.Tests -a --format=plain
