@@ -1,0 +1,24 @@
+name: Test FPC
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install prerequisites
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update
+          sudo apt-get install -y fpc-3.2.2
+      - name: Build testsuite
+        run: |
+          cd Tests
+          fpc -B -MDelphi "Underscore.Delphi.Springless.Tests.dpr"
+      - name: Test
+        run: ./Underscore.Delphi.Springless
