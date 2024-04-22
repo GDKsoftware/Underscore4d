@@ -18,7 +18,7 @@ type
     class function Map<T, S>(const List: TList<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
     class function Map<T, S>(const List: TEnumerable<T>; const MapFunc: _Func<T, S>): TList<S>; overload;
     class function Map<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>; overload;
-    class function Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<TPair<T,V>, S>): TList<S>; overload;
+    class function Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<System.Generics.Collections.TPair<T,V>, S>): TList<S>; overload;
     class function Map<T, V, S>(const List: IDictionary<T, V>; const MapFunc: _Func<TPair<T,V>, S>): IList<S>; overload;
 
     class function MapP<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>;
@@ -284,9 +284,9 @@ begin
     Result.Add(MapFunc(Item));
 end;
 
-class function _.Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<TPair<T, V>, S>): TList<S>;
+class function _.Map<T, V, S>(const List: TDictionary<T, V>; const MapFunc: _Func<System.Generics.Collections.TPair<T, V>, S>): TList<S>;
 var
-  Item: TPair<T, V>;
+  Item: System.Generics.Collections.TPair<T, V>;
 begin
   Result := TList<S>.Create;
   Result.Capacity := List.Count;
