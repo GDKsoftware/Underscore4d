@@ -309,7 +309,6 @@ end;
 class function _.MapP<T, S>(const List: IEnumerable<T>; const MapFunc: _Func<T, S>): IList<S>;
 var
   Item: T;
-  Idx: Integer;
   ResultList: IList<S>;
 begin
   Result := TCollections.CreateList<S>;
@@ -421,6 +420,8 @@ var
   ItemValue: Integer;
   MinValue: Integer;
 begin
+  Result := Default(T);
+
   MinValue := MaxInt;
 
   if List.Count = 0 then
@@ -443,6 +444,8 @@ var
   ItemValue: Integer;
   MaxValue: Integer;
 begin
+  Result := Default(T);
+
   MaxValue := -MaxInt;
 
   if List.Count = 0 then
